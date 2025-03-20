@@ -45,12 +45,57 @@ public class SpellingBee {
     //  that will find the substrings recursively.
     public void generate() {
         // YOUR CODE HERE — Call your recursive method!
+        generateWords("",letters);
+    }
+    private void generateWords(String start, String end) {
+        if(!start.isEmpty()) {
+            words.add(start);
+        }
+        for (int i =0; i < end.length(); i++) {
+            generateWords(start + end.charAt(i), end.substring(0,i) + end.substring(i+1));
+        }
     }
 
     // TODO: Apply mergesort to sort all words. Do this by calling ANOTHER method
     //  that will find the substrings recursively.
     public void sort() {
         // YOUR CODE HERE
+        mergeSort(words,0,words.size()-1);
+    }
+    private void mergeSort (ArrayList<String> list, int left, int right) {
+        if (left < right) {
+            int middle = (left +right) / 2;
+            mergeSort(list,left,middle);
+            mergeSort(list,middle + 1,right);
+            merge(list,left,middle,right);
+        }
+    }
+    private void merge(ArrayList<String> list, int left, int middle, int right) {
+        ArrayList<String> leftList = new ArrayList<>();
+        ArrayList<String> rightList = new ArrayList<>();
+        for (int i = left; i <= middle; i++) {
+            leftList.add(list.get(i));
+        }
+        for (int i = middle + 1; i <= right; i++) {
+            rightList.add(list.get(i));
+        }
+        int i = 0;
+        int j = 0;
+        int k = left;
+        while (i < leftList.size() && j < rightList.size()) {
+            if (leftList.get(i).compareTo(rightList.get(j)) <= 0) {
+                list.set(k++, leftList.get(i++));
+            } else {
+                list.set(k++, rightList.get(j++));
+            }
+        }
+        while (i < leftList.size()) {
+            list.set(k++, leftList.get(i++));
+        }
+        while (j < rightList.size()) {
+            list.set(k++, rightList.get(j++));
+        }
+
     }
 
     // Removes duplicates from the sorted list.
@@ -69,6 +114,28 @@ public class SpellingBee {
     //  If it is not in the dictionary, remove it from words.
     public void checkWords() {
         // YOUR CODE HERE
+        for (int i = 0; i < words.size(); i++) {
+            String word = words.get(i);
+            int left = 0;
+            int right = DICTIONARY_SIZE - 1;
+            boolean found = false;
+            while (left <= right) {
+                int middle = left + (right-left) / 2;
+                int comparison = word.compareTo(DICTIONARY[middle]);
+                if (comparison == 0) {
+                    found = true;
+                    break;
+                } else if(comparison <= 0) {
+                    right = middle - 1;
+                } else {
+                    left = middle + 1;
+                }
+            }
+            if (!found) {
+                words.remove(i);
+                i--;
+            }
+        }
     }
 
     // Prints all valid words to wordList.txt
